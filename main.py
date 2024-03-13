@@ -1,4 +1,5 @@
 from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver import ChromeOptions
@@ -12,7 +13,8 @@ options = ChromeOptions()
 # options.add_argument("--headless=new")
 options.add_argument("--ignore-certificate-errors")
 options.add_argument("--ignore-ssl-errors")
-driver = webdriver.Chrome(options=options)
+options.add_argument('--blink-settings=imagesEnabled=false')
+driver = uc.Chrome(use_subprocess=True, options=options)
 
 data = []
 
@@ -28,15 +30,17 @@ def scrapeSite(url):
     # Find cloudflare Decline -- Detects properly, doesnt reset
     try :
         if driver.find_element(By.CSS_SELECTOR, "body.no-js") != None:
-            driver.close()
             print("\nCloudflare Detected refreshing...\n")
-            time.sleep(5)
-            retrieve_html_page(url)
+            scrapeSite("https://www.google.com")
+            scrapeSite(url)
+            time.sleep(2)
     except NoSuchElementException:
         return
     return
 
 def main():
+    print("Program Started\n")
+
     urlInfo = "https://www.tracker.gg/valorant/leaderboards/ranked/all/"
     scrapeSite(urlInfo)
 
@@ -65,16 +69,19 @@ def main():
     for line in Lines:
         if ("valorant" in line):
             urlInfo = line
+            time.sleep(2)
             scrapeSite(urlInfo)
-
-            print("\n\nScrapping Profiles\n\n")
+            print("\nScrapping Profiles\n")
 
             # Find all data Elements
             username = driver.find_element(By.CSS_SELECTOR, 'span.trn-ign__username').text
+
+            print(username)
+
             currentRank = driver.find_element(By.CSS_SELECTOR, 'div.rating-entry__rank-info div.value').text
             gamesPlayed = driver.find_element(By.CSS_SELECTOR, 'div.title-stats > span.matches').text
             winRate = driver.find_element(By.CSS_SELECTOR, 'div.numbers > span[title*="Win %"] + span[class="flex items-center gap-2"] > span.value').text
-            trackerScore = driver.find_element(By.CSS_SELECTOR, 'div.performance-score__container div.value ').text
+            trackerScore = driver.find_element(By.CSS_SELECTOR, 'div.performance-score__container div.value').text
             kast = driver.find_element(By.CSS_SELECTOR, 'div.numbers > span[title*="KAST"] + span[class="flex items-center gap-2"] > span.value').text
             dDelta = driver.find_element(By.CSS_SELECTOR, 'div.numbers > span[title*="DDΔ/Round"] + span[class="flex items-center gap-2"] > span.value').text
             acs = driver.find_element(By.CSS_SELECTOR, 'div.numbers > span[title*="ACS"] + span[class="flex items-center gap-2"] > span.value').text
@@ -82,7 +89,7 @@ def main():
             kadRatio = driver.find_element(By.CSS_SELECTOR, 'div.numbers > span[title*="KAD Ratio"] + span[class="flex items-center gap-2"] > span.value').text
             killsPerRound = driver.find_element(By.CSS_SELECTOR, 'div.numbers > span[title*="Kills/Round"] + span[class="flex items-center gap-2"] > span.value').text
             hsPercent = driver.find_element(By.CSS_SELECTOR, 'div.giant-stats > div:nth-child(3) > div > div.numbers > span.flex.items-center.gap-2 > span').text
-            roundWinPercent = driver.find_element(By.CSS_SELECTOR, 'div.performance-score__stats > div[class="stat stat--tier-S"] div.stat__value').text
+            roundWinPercent = driver.find_element(By.CSS_SELECTOR, 'div.performance-score__stats > div[class*="stat stat--tier"] div.stat__value').text
             damagePerRound = driver.find_element(By.CSS_SELECTOR, 'div.giant-stats > div:nth-child(1) > div > div.numbers > span.flex.items-center.gap-2 > span').text
 
             print("\n\nFinished getting Data\n\n")
@@ -103,7 +110,6 @@ def main():
                 'Round Win %' : roundWinPercent,
             }
 
-            print("\n\nstats.json Edited\n\n")
 
             # Create player Json Files
             if os.path.isfile(f"ValorantAccelerator/data/{username}.json"):
@@ -112,6 +118,7 @@ def main():
             f2 = open(f'data/{username}.json', 'w')
             json.dump(data, f2)
 
+            print(f"\n{username}.json Edited/Created\n")
         i += 1
         
     driver.quit()
