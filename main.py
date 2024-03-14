@@ -122,6 +122,7 @@ def main():
                 'kadRatio' : kadRatio,
                 'killsPerRound' : killsPerRound,
                 'roundWinPercent' : roundWinPercent,
+                'damagePerRound' : damagePerRound,
             }
 
             # Create player Json Files

@@ -1,44 +1,37 @@
 import os
 import json
-import time
 import re
-#import main
 
 directory = os.path.join(os.path.dirname(__file__), "data")
 
 def main():
-    # Look for proper user file
-    if os.path.exists(directory):
-        for file in os.listdir(directory):
-            data = []
-            if file.endswith(".json"):
-                f = open(f"{directory}\\{file}", 'r')
-                print(file)
-                data = json.load(f)
-
-                for i in data:
-                    print(i)
-
-                # Save user data locally
-                currentRank = re.sub(r'[^\d.]+', '', data[0].get('currentRank', ''))
-                gamesPlayed = re.sub(r'[^\d.]+', '', data[0].get('gamesPlayed', ''))
-                winRate = re.sub(r'[^\d.]+', '', data[0].get('winRate', ''))
-                hsPercent = re.sub(r'[^\d.]+', '', data[0].get('hsPercent', ''))
-                trackerScore = data[0].get('trackerScore', '')[:data[0].get('trackerScore', '').find(' ')]
-                print(trackerScore)
-                kast = re.sub(r'[^\d.]+', '', data[0].get('kast', ''))
-                acs = re.sub(r'[^\d.]+', '', data[0].get('acs', ''))
-                kdRatio = re.sub(r'[^\d.]+', '', data[0].get('kdRatio', ''))
-                kadRatio = re.sub(r'[^\d.]+', '', data[0].get('kadRatio', ''))
-                killsPerRound = re.sub(r'[^\d.]+', '', data[0].get('killsPerRound', ''))
-                roundWinPercent = re.sub(r'[^\d.]+', '', data[0].get('roundWinPercent', ''))
-                damagePerRound = re.sub(r'[^\d.]+', '', data[0].get('damagePerRound', ''))
-
-                # Call AI Function Here
-    else:
-        print("Directory Does not exist... Adding Folders...")
+    if not os.path.exists(directory):
+        print("Directory does not exist... Adding Folders...")
         os.makedirs(directory)
+        return
 
+    for filename in os.listdir(directory):
+        if filename.endswith(".json"):
+            filepath = os.path.join(directory, filename)
+            print(filename)
+            
+            with open(filepath, 'r') as file:
+                data = json.load(file)
+
+            if data:
+                # Isolate integers (thx Chatgpt)
+                fields = ['currentRank', 'gamesPlayed', 'winRate', 'hsPercent',
+                          'trackerScore', 'kast', 'acs', 'kdRatio', 'kadRatio',
+                          'killsPerRound', 'roundWinPercent', 'damagePerRound']
+
+                isolatedData = {}
+                for field in fields:
+                    if field == "trackerScore":
+                        isolatedData[field] = data[0].get(field, '')[:data[0].get(field, '').find(' ')]
+                    else:
+                        isolatedData[field] = re.sub(r'[^\d.]+', '', data[0].get(field, ''))
+
+                print(isolatedData)
 
 if __name__ == "__main__":
     main()
