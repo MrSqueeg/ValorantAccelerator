@@ -15,15 +15,23 @@ KEY = os.getenv("KEY")
 def main():
     # Filler test values
     region = "na"
-    name = "mrsqueeg"
+    name = "MrSqueeg"
     tag = "3225"
-    url = f'https://api.henrikdev.xyz/valorant/v3/matches/{region}/{name}/{tag}'
+    platform = "pc"
+    size = 4
+    mode = 'unrated'
+    params = {"size": {size}, "mode": {mode}}
+    url = f'https://api.henrikdev.xyz/valorant/v4/matches/{region}/{platform}/{name}/{tag}'
+
+    print(url)
 
 
-    data = get.data(url, KEY)
-    get.save(data, "matches.json")
+    data = get.retrieve(url, KEY, params)
 
-    averager.get_match_data(data, name)
+    if data != 0:
+        data = data['data']
+        get.save(data, "matches.json")
+        averager.get_match_data(data, name)
 
 if __name__ == "__main__":
     main()

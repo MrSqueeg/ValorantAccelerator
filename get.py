@@ -5,18 +5,23 @@ import requests
 import os
 import averager
 
-def retrieve(url, API_KEY):
+def retrieve(url, API_KEY, params):
     headers = {
         'Authorization': API_KEY,
         'User-Agent': 'Valorant Accelerator'
     }
 
     try:
-        response = requests.get(url=url, headers=headers)
-        print(response.text)
+        print("Retriving Information...")
+        response = requests.get(url=url, headers=headers, params=params)
 
-        data = json.loads(response.text)['data']
-        return data
+        # Check if data recieved
+        data = json.loads(response.text)
+        if data['status'] == 200:
+            print("Data reiceved!")
+            return data
+        
+        return 0
 
     except requests.exceptions.RequestException as e:
         print(f'Error while requesting api: {e}')
