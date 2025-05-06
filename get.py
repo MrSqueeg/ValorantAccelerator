@@ -17,6 +17,14 @@ def retrieve(url, API_KEY, params):
 
         # Check if data recieved
         data = json.loads(response.text)
+
+        if 'status' not in data:
+            print('ERROR No status recieved')
+            try:
+                print(data)
+            except Exception as e:
+                print(e)
+                
         if data['status'] == 200:
             print("Data reiceved!")
             return data
@@ -28,4 +36,4 @@ def retrieve(url, API_KEY, params):
 
 def save(data, file_name):
     with open(file_name, 'w', encoding='utf-8') as file:
-        file.write(str(data))
+        json.dump(data, file, indent=4)
