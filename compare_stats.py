@@ -12,11 +12,9 @@ def compare_stats(user_stats, average_stats):
                         # Add fields and specifics here
                         #  - Maybe AI stuff later.
                         difference = user_data[field] - average_data[field]
-                        print(f"user_data {user_data[field]} - average_data {average_data[field]} = difference {difference}")
                         if field == 'Legshot Rate' or 'Bodyshot Rate':
                             difference *= -1
                             
-                        print(f"difference {difference}")
                         if difference <= 0:
                             print(f"work on {field}")
                         else:
