@@ -40,7 +40,7 @@ def get_match_data(data, name):
         matches += 1
         team = None
         players = match['players']
-        print(f'Match #{matches}, Mode: {match['metadata']['queue']['name']}')
+        print(f"Match #{matches}, Mode: {match['metadata']['queue']['name']}")
         for player in players:
             j += 1
 

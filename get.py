@@ -21,13 +21,16 @@ def retrieve(url, API_KEY, params):
         if 'status' not in data:
             print('ERROR No status recieved')
             try:
-                print(data)
+                if data['errors']['status'] == 429:
+                    print("\nRate limit reached, Pausing for 1 Minute\n")
+                    time.sleep(60)
+                    return retrieve(url, API_KEY, params)
             except Exception as e:
                 print(e)
-                
-        if data['status'] == 200:
-            print("Data reiceved!")
-            return data
+        else:     
+            if data['status'] == 200:
+                print("Data reiceved!")
+                return data
         
         return 0
 
